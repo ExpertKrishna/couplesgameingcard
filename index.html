@@ -5,9 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Couples Connection Deck</title>
     
+    <!-- PWA Settings -->
     <meta name="theme-color" content="#2b0813">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="./manifest.json">
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js');
+        }
+    </script>
 
     <style>
         * { box-sizing: border-box; transition: background 0.5s ease, color 0.3s ease, border-color 0.5s ease; }
@@ -19,6 +27,7 @@
             color: #fff; position: relative; overflow-x: hidden; user-select: none;
         }
 
+        /* Dynamic Background Themes by Level */
         body.lvl-all, body.lvl-1 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #feada6 100%); }
         body.lvl-2 { background: linear-gradient(135deg, #4a0e17 0%, #800f2f 60%, #c9184a 100%); }
         body.lvl-3 { background: linear-gradient(135deg, #2b0813 0%, #590d22 50%, #a4133c 100%); }
@@ -156,12 +165,18 @@
         <p class="subtitle">Select mood & draw a card</p>
 
         <div class="top-controls">
+            <!-- Full Sequence of Languages -->
             <div class="lang-wrapper">
                 <label>🌐</label>
                 <select class="lang-select" id="langSelect" onchange="changeLanguage(this.value)">
                     <option value="hinglish">Hinglish</option>
                     <option value="hindi">हिंदी (Hindi)</option>
                     <option value="english">English</option>
+                    <option value="marathi">मराठी (Marathi)</option>
+                    <option value="gujarati">ગુજરાતી (Gujarati)</option>
+                    <option value="bengali">বাংলা (Bengali)</option>
+                    <option value="tamil">தமிழ் (Tamil)</option>
+                    <option value="telugu">తెలుగు (Telugu)</option>
                 </select>
             </div>
             <button class="rules-btn" onclick="toggleModal(true)">How to Play 📖</button>
@@ -269,14 +284,88 @@
                 inPerson: "One partner draws a card and asks the question. The other partner answers honestly and lovingly.",
                 longDist: "Open the app during a video call. Take turns shuffling cards and ask each other intimate questions.",
                 gen: "No skipping allowed! If someone refuses to answer, they must fulfill a romantic wish for their partner!"
+            },
+            marathi: {
+                title: "कसे खेळायचे 📖",
+                inPerson: "एकाने बटण दाबून कार्ड काढावे आणि दुसऱ्याला प्रश्न विचारावा. दुसऱ्याने प्रामाणिकपणे उत्तर द्यावे.",
+                longDist: "व्हिडिओ कॉलवर हे ॲप उघडा आणि आळीपाळीने कार्ड शफल करून प्रश्न विचारा.",
+                gen: "कोणताही प्रश्न सोडता येणार नाही! उत्तर दिले नाही तर पार्टनरची इच्छा पूर्ण करावी लागेल!"
+            },
+            gujarati: {
+                title: "કેવી રીતે રમવું 📖",
+                inPerson: "એક ભાગીદાર બટન દબાવીને કાર્ડ ખેંચે છે અને પ્રશ્ન પૂછે છે. બીજો ભાગીદાર સાચો જવાબ આપે છે.",
+                longDist: "વીડિયો કૉલ દરમિયાન ઍપ ખોલો અને વારાફરતી પ્રશ્નો પૂછો.",
+                gen: "કોઈ પ્રશ્ન છોડી શકાશે નહીં! જો કોઈ જવાબ ન આપે, તો વિનંતી પૂરી કરવી પડશે!"
+            },
+            bengali: {
+                title: "কিভাবে খেলবেন 📖",
+                inPerson: "একজন কার্ড তুলে প্রশ্ন করবে এবং অন্যজন সততার সাথে উত্তর দেবে।",
+                longDist: "ভিডিও কলের সময় অ্যাপটি খুলে একে অপরকে প্রশ্ন জিজ্ঞাসা করুন।",
+                gen: "কোন প্রশ্ন স্কিপ করা যাবে না! উত্তর না দিলে পার্টনারের ইচ্ছে পূরণ করতে হবে!"
+            },
+            tamil: {
+                title: "எப்படி விளையாடுவது 📖",
+                inPerson: "ஒருவர் கார்டை எடுத்து கேள்வி கேட்க வேண்டும், மற்றொருவர் உண்மையாக பதிலளிக்க வேண்டும்.",
+                longDist: "வீடியோ அழைப்பின் போது ஆப் திறந்து கேள்விகளைக் கேட்கவும்.",
+                gen: "எந்த கேள்வியையும் தவிர்க்க முடியாது! பதில் சொல்லாவிட்டால் ஆசையை நிறைவேற்ற வேண்டும்!"
+            },
+            telugu: {
+                title: "ఎలా ఆడాలో 📖",
+                inPerson: "ఒక భాగస్వామి కార్డు తీసి ప్రశ్న అడుగుతారు, మరొకరు నిజాయితీగా సమాధానం చెప్పాలి.",
+                longDist: "వీడియో కాల్‌లో యాప్ తెరిచి ప్రశ్నలు అడగండి.",
+                gen: "ఏ ప్రశ్నా వదిలేయకూడదు! సమాధానం చెప్పకపోతే కోరిక తీర్చాలి!"
             }
         };
 
         const cards = [
-            { cat: "Level 1", label: "Ice Breakers 👏", hinglish: "Jab hum pehli baar mile the, toh tumne mujhme sabse pehli cheez kya notice ki thi?", hindi: "जब हम पहली बार मिले थे, तो तुमने मुझमें सबसे पहली चीज़ क्या नोटिस की थी?", english: "When we first met, what was the very first thing you noticed about me?" },
-            { cat: "Level 2", label: "Deep Romance 💖", hinglish: "Mere saath tumhari perfect romantic date night kaisi honi chahiye?", hindi: "मेरे साथ तुम्हारी परफेक्ट रोमांटिक डेट नाइट कैसी होनी चाहिए?", english: "What does your idea of a perfect romantic date night with me look like?" },
-            { cat: "Level 3", label: "Bold Desires 💋", hinglish: "Bedroom me mera aisa kaun sa touch hai jo tumhara mood turant turn on kar deta hai?", hindi: "बेडरूम में मेरा ऐसा कौन सा टच है जो तुम्हारा मूड तुरंत ऑन कर देता है?", english: "Which touch of mine in the bedroom instantly turns you on?" },
-            { cat: "Level 4", label: "Wild Midnight 🔥", hinglish: "Aisi kaun si wild secret fantasy hai jo tumne aaj tak mujhe khulkar nahi batayi?", hindi: "ऐसी कौन सी वाइल्ड सीक्रेट फैंटेसी है जो तुमने आज तक मुझे खुलकर नहीं बताई?", english: "What is a wild secret fantasy you've never shared with me openly?" }
+            {
+                cat: "Level 1",
+                label: "Ice Breakers 👏",
+                hinglish: "Jab hum pehli baar mile the, toh tumne mujhme sabse pehli cheez kya notice ki thi?",
+                hindi: "जब हम पहली बार मिले थे, तो तुमने मुझमें सबसे पहली चीज़ क्या नोटिस की थी?",
+                english: "When we first met, what was the very first thing you noticed about me?",
+                marathi: "आपण जेव्हा पहिल्यांदा भेटलो होतो, तेव्हा तू माझ्यात पहिली गोष्ट काय नोटिस केली होतीस?",
+                gujarati: "જ્યારે આપણે પહેલીવાર મળ્યા હતા, ત્યારે તમે મારામાં સૌથી પહેલી કઈ વસ્તુ નોટિસ કરી હતી?",
+                bengali: "আমরা যখন প্রথম দেখা করেছিলাম, তখন আমার মধ্যে প্রথম কোন জিনিসটি তোমার নজরে এসেছিল?",
+                tamil: "நாம் முதலில் சந்தித்தபோது, என்னிடம் நீங்கள் முதலில் கவனித்த விஷயம் எது?",
+                telugu: "మనం మొదటిసారి కలిసినప్పుడు, నాలో మీరు గమనించిన మొదటి విషయం ఏమిటి?"
+            },
+            {
+                cat: "Level 2",
+                label: "Deep Romance 💖",
+                hinglish: "Mere saath tumhari perfect romantic date night kaisi honi chahiye?",
+                hindi: "मेरे साथ तुम्हारी परफेक्ट रोमांटिक डेट नाइट कैसी होनी चाहिए?",
+                english: "What does your idea of a perfect romantic date night with me look like?",
+                marathi: "माझ्यासोबत तुझी परफेक्ट रोमँतिक डेट नाईट कशी असली पाहिजे?",
+                gujarati: "મારી સાથે તમારી પર્ફેક્ટ રોમેન્ટિક ડેટ નાઇટ કેવી હોવી જોઈએ?",
+                bengali: "আমার সাথে তোমার নিখুঁত রোমান্টিক ডেট নাইট কেমন হওয়া উচিত?",
+                tamil: "என்னுடன் ஒரு சரியான ரொமாண்டிக் டேட் நைட் எப்படி இருக்க வேண்டும்?",
+                telugu: "నాలో మీ పరిపూర్ణ రోమాంటిక్ డేట్ నైట్ ఎలా ఉండాలి?"
+            },
+            {
+                cat: "Level 3",
+                label: "Bold Desires 💋",
+                hinglish: "Bedroom me mera aisa kaun sa touch hai jo tumhara mood turant turn on kar deta hai?",
+                hindi: "बेडरूम में मेरा ऐसा कौन सा टच है जो तुम्हारा मूड तुरंत ऑन कर देता है?",
+                english: "Which touch of mine in the bedroom instantly turns you on?",
+                marathi: "बेडरूममध्ये माझा असा कोणता स्पर्श आहे जो तुझा मूड लगेच १००% ऑन करतो?",
+                gujarati: "બેડરૂમમાં મારો એવો કયો સ્પર્શ છે જે તમારો મૂડ તરત જ ઓન કરી દે છે?",
+                bengali: "বেডরুমে আমার কোন স্পর্শটি তোমার মুড সঙ্গে সঙ্গে ১০০% অন করে দেয়?",
+                tamil: "படுக்கையறையில் என்னுடைய எந்தத் தொடுதல் உங்கள் மனநிலையை உடனே மாற்றுகிறது?",
+                telugu: "బెడ్‌రూమ్‌లో నా ఏ స్పర్శ మీ మూడ్‌ని తక్షణమే మారుస్తుంది?"
+            },
+            {
+                cat: "Level 4",
+                label: "Wild Midnight 🔥",
+                hinglish: "Aisi kaun si wild secret fantasy hai jo tumne aaj tak mujhe khulkar nahi batayi?",
+                hindi: "ऐसी कौन सी वाइल्ड सीक्रेट फैंटेसी है जो तुमने आज तक मुझे खुलकर नहीं बताई?",
+                english: "What is a wild secret fantasy you've never shared with me openly?",
+                marathi: "अशी कोणती वाईल्ड सीक्रेट फॅन्टसी आहे जी तू आजपर्यंत मला उघडपणे सांगितली नाहीस?",
+                gujarati: "એવી કઈ વાઇલ્ડ સીક્રેટ ફેન્ટસી છે જે તમે આજ સુધી મને ખુલ્લીને નથી કહી?",
+                bengali: "এমন কোন ওয়াইল্ড সিক্রেট ফ্যান্টাসি আছে যা তুমি আজ পর্যন্ত আমাকে খুলে বলোনি?",
+                tamil: "இதுவரை என்னிடம் வெளிப்படையாகச் சொல்லாத ரகசிய ஆசை எது?",
+                telugu: "ఇప్పటివరకు నాకీ చెప్పని రకస్య కోరిక ఏమిటి?"
+            }
         ];
 
         let currentCategory = "All";
@@ -320,7 +409,6 @@
         }
 
         function drawCardWithEffect() {
-            // Safe Vibration Catch
             try {
                 if ("vibrate" in navigator) navigator.vibrate(50);
             } catch(e){}
@@ -363,7 +451,6 @@
 
                 cardBox.className = 'card ' + specificClass;
                 
-                // Safe Fallback for Language
                 cardText.innerText = randomCard[currentLang] || randomCard['hinglish'] || randomCard['english'] || "No question available";
                 cardTag.innerText = randomCard.label || randomCard.cat;
                 cardCounter.innerText = `Card ${randomIndex + 1} of ${filtered.length}`;
